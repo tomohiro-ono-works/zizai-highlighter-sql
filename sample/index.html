@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SQL Highlighter Sample</title>
+  <link rel="stylesheet" href="../src/sql-highlighter.css">
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f6f8fa;
+      color: #1f2937;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+
+    .description,
+    .status,
+    .hint {
+      color: #57606a;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 24px 0 12px;
+    }
+
+    select,
+    button {
+      min-width: 160px;
+      padding: 8px 10px;
+      border: 1px solid #d0d7de;
+      border-radius: 6px;
+      background: #ffffff;
+      font: inherit;
+    }
+
+    button {
+      min-width: auto;
+      cursor: pointer;
+    }
+
+    .sample-decoration {
+      background: #fff3a3;
+      border-radius: 2px;
+    }
+
+    #sql {
+      width: 100%;
+      height: 480px;
+      padding: 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .status[data-error="true"] {
+      color: #cf222e;
+      font-weight: 600;
+    }
+
+    .hint {
+      margin-top: 12px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <h1>SQL Highlighter</h1>
+  <p class="description">既存のtextareaへ、リアルタイムハイライトと論理行番号を追加するサンプルです。</p>
+
+  <div class="toolbar">
+    <label for="dialect">SQL方言</label>
+    <select id="dialect">
+      <option value="bigquery">BigQuery (GoogleSQL)</option>
+      <option value="duckdb">DuckDB</option>
+    </select>
+    <button id="decorate" type="button">customer_idを装飾</button>
+    <button id="clear-decoration" type="button">装飾解除</button>
+  </div>
+
+  <p id="status" class="status">辞書を読み込みました。</p>
+
+  <textarea id="sql" aria-label="SQL editor">-- BigQuery example
+WITH customer_sales AS (
+  SELECT
+    o.customer_id,
+    SUM(o.amount) AS total_sales,
+    COUNT(*) AS order_count
+  FROM `sample-project.analytics.orders` AS o
+  WHERE o.status = 'active'
+    AND o.amount >= 100
+    AND o.deleted_at IS NULL
+    AND o.customer_id = @customer_id
+  GROUP BY o.customer_id
+)
+SELECT
+  cs.customer_id,
+  cs.total_sales,
+  cs.order_count
+FROM customer_sales AS cs
+WHERE cs.total_sales BETWEEN 100 AND 10000
+ORDER BY cs.total_sales DESC;</textarea>
+
+  <p class="hint">折り返しは無効です。JSON辞書のブラウザ登録ファイルを使用するため、ZIP展開後にfile://でも直接確認できます。</p>
+
+  <script src="../src/sql-highlighter.js"></script>
+  <script src="../src/dictionaries/bigquery.js"></script>
+  <script src="../src/dictionaries/duckdb.js"></script>
+  <script>
+    (function () {
+      "use strict";
+
+      var textarea = document.getElementById("sql");
+      var selector = document.getElementById("dialect");
+      var status = document.getElementById("status");
+      var decorateButton = document.getElementById("decorate");
+      var clearDecorationButton = document.getElementById("clear-decoration");
+      var examples = {
+        bigquery: textarea.value,
+        duckdb: "-- DuckDB example\nSELECT\n  s.category,\n  100_000 AS target_amount,\n  $$SELECT and FROM are text here$$ AS note,\n  COUNT(*)::BIGINT AS row_count,\n  ROUND(AVG(s.price), 2) AS average_price\nFROM sales AS s\nWHERE s.sold_at >= $1\n  AND s.active IS TRUE\nGROUP BY ALL\nORDER BY row_count DESC;"
+      };
+
+      try {
+        var editor = SqlHighlighter.attach(textarea, {
+          dialect: selector.value,
+          lineNumbers: true,
+          tabSize: 2
+        });
+
+        selector.addEventListener("change", function () {
+          textarea.value = examples[selector.value];
+          editor.clearDecorations();
+          editor.setDialect(selector.value);
+        });
+
+        decorateButton.addEventListener("click", function () {
+          var target = "customer_id";
+          var decorations = [];
+          var start = textarea.value.indexOf(target);
+          while (start !== -1) {
+            decorations.push({
+              start: start,
+              end: start + target.length,
+              className: "sample-decoration"
+            });
+            start = textarea.value.indexOf(target, start + target.length);
+          }
+          editor.setDecorations(decorations);
+        });
+
+        clearDecorationButton.addEventListener("click", function () {
+          editor.clearDecorations();
+        });
+      } catch (error) {
+        status.dataset.error = "true";
+        status.textContent = "辞書を読み込めませんでした: " + error.message;
+      }
+    }());
+  </script>
+</body>
+</html>

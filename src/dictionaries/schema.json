@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SQL Highlighter Dialect Dictionary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "displayName",
+    "keywords",
+    "dataTypes",
+    "functions",
+    "lexical"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "keywords": {
+      "$ref": "#/$defs/wordList"
+    },
+    "dataTypes": {
+      "$ref": "#/$defs/wordList"
+    },
+    "functions": {
+      "$ref": "#/$defs/wordList"
+    },
+    "lexical": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lineComments",
+        "blockComments",
+        "identifierQuotes",
+        "stringQuotes",
+        "tripleStringQuotes",
+        "stringPrefixes",
+        "rawStringPrefixes",
+        "dollarQuotedStrings",
+        "parameterModes",
+        "numericUnderscores"
+      ],
+      "properties": {
+        "lineComments": {
+          "$ref": "#/$defs/nonEmptyStringList"
+        },
+        "blockComments": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "string",
+                "minLength": 1
+              }
+            ],
+            "items": false,
+            "minItems": 2,
+            "maxItems": 2
+          }
+        },
+        "identifierQuotes": {
+          "$ref": "#/$defs/nonEmptyStringList"
+        },
+        "stringQuotes": {
+          "$ref": "#/$defs/nonEmptyStringList"
+        },
+        "tripleStringQuotes": {
+          "$ref": "#/$defs/nonEmptyStringList"
+        },
+        "stringPrefixes": {
+          "$ref": "#/$defs/nonEmptyStringList"
+        },
+        "rawStringPrefixes": {
+          "$ref": "#/$defs/nonEmptyStringList"
+        },
+        "dollarQuotedStrings": {
+          "type": "boolean"
+        },
+        "parameterModes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "question",
+              "atName",
+              "colonName",
+              "dollarNumber",
+              "dollarName"
+            ]
+          }
+        },
+        "numericUnderscores": {
+          "type": "boolean"
+        },
+        "operators": {
+          "$ref": "#/$defs/nonEmptyStringList"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "wordList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z][A-Z0-9_]*$"
+      }
+    },
+    "nonEmptyStringList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}
