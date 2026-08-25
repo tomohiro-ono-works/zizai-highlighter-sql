@@ -100,20 +100,21 @@
     await test("highlight CSS matches the requested palette and font styles", function () {
       var host = document.createElement("div");
       host.className = "sqhl-editor";
-      [
-        ["keyword", "rgb(9, 145, 182)", "italic", "none", "rgba(0, 0, 0, 0)"],
-        ["operator", "rgb(123, 48, 208)", "normal", "none", "rgba(0, 0, 0, 0)"],
-        ["function", "rgb(177, 16, 142)", "italic", "none", "rgba(0, 0, 0, 0)"],
-        ["table", "rgb(41, 112, 199)", "normal", "underline", "rgba(0, 0, 0, 0)"],
-        ["column", "rgb(130, 130, 130)", "normal", "none", "rgba(0, 0, 0, 0)"],
-        ["alias", "rgb(127, 219, 202)", "normal", "none", "rgba(0, 0, 0, 0)"],
-        ["string", "rgb(164, 65, 133)", "normal", "none", "rgba(0, 0, 0, 0)"],
-        ["number", "rgb(23, 71, 129)", "normal", "none", "rgba(0, 0, 0, 0)"],
-        ["literal", "rgb(23, 71, 129)", "normal", "none", "rgba(0, 0, 0, 0)"],
-        ["comment", "rgb(53, 123, 66)", "normal", "none", "rgb(242, 242, 242)"],
-        ["parameter", "rgb(198, 62, 211)", "normal", "none", "rgba(0, 0, 0, 0)"],
-        ["punctuation", "rgb(62, 62, 62)", "normal", "none", "rgba(0, 0, 0, 0)"]
-      ].forEach(function (entry) {
+      var cases = [
+        ["keyword", "rgb(123, 48, 208)", "italic", "none", "rgba(0, 0, 0, 0)"],
+        ["operator", "rgb(123, 48, 208)", "italic", "none", "rgba(0, 0, 0, 0)"],
+        ["function", "rgb(211, 62, 130)", "italic", "none", "rgba(0, 0, 0, 0)"],
+        ["table", "rgb(62, 143, 241)", "italic", "underline", "rgb(244, 248, 252)"],
+        ["column", "rgb(37, 37, 37)", "normal", "none", "rgba(0, 0, 0, 0)"],
+        ["alias", "rgb(0, 0, 0)", "normal", "none", "rgba(0, 0, 0, 0)"],
+        ["string", "rgb(211, 62, 130)", "normal", "none", "rgb(252, 245, 248)"],
+        ["number", "rgb(211, 62, 130)", "normal", "none", "rgb(252, 245, 248)"],
+        ["literal", "rgb(123, 48, 208)", "italic", "none", "rgba(0, 0, 0, 0)"],
+        ["comment", "rgb(123, 48, 208)", "italic", "none", "rgb(237, 222, 255)"],
+        ["parameter", "rgb(211, 62, 130)", "normal", "none", "rgb(252, 245, 248)"],
+        ["punctuation", "rgb(125, 125, 125)", "normal", "none", "rgba(0, 0, 0, 0)"]
+      ];
+      cases.forEach(function (entry) {
         var span = document.createElement("span");
         span.className = "sqhl-" + entry[0];
         span.textContent = entry[0];
@@ -122,19 +123,12 @@
       document.body.appendChild(host);
 
       Array.prototype.forEach.call(host.children, function (span, index) {
-        var expected = [
-          ["rgb(9, 145, 182)", "italic", "none", "rgba(0, 0, 0, 0)"], ["rgb(123, 48, 208)", "normal", "none", "rgba(0, 0, 0, 0)"],
-          ["rgb(177, 16, 142)", "italic", "none", "rgba(0, 0, 0, 0)"], ["rgb(41, 112, 199)", "normal", "underline", "rgba(0, 0, 0, 0)"],
-          ["rgb(130, 130, 130)", "normal", "none", "rgba(0, 0, 0, 0)"], ["rgb(127, 219, 202)", "normal", "none", "rgba(0, 0, 0, 0)"],
-          ["rgb(164, 65, 133)", "normal", "none", "rgba(0, 0, 0, 0)"], ["rgb(23, 71, 129)", "normal", "none", "rgba(0, 0, 0, 0)"],
-          ["rgb(23, 71, 129)", "normal", "none", "rgba(0, 0, 0, 0)"], ["rgb(53, 123, 66)", "normal", "none", "rgb(242, 242, 242)"],
-          ["rgb(198, 62, 211)", "normal", "none", "rgba(0, 0, 0, 0)"], ["rgb(62, 62, 62)", "normal", "none", "rgba(0, 0, 0, 0)"]
-        ][index];
+        var expected = cases[index];
         var style = window.getComputedStyle(span);
-        assert(style.color === expected[0], span.className + " color mismatch: " + style.color);
-        assert(style.fontStyle === expected[1], span.className + " font-style mismatch: " + style.fontStyle);
-        assert(style.textDecorationLine === expected[2], span.className + " text-decoration mismatch: " + style.textDecorationLine);
-        assert(style.backgroundColor === expected[3], span.className + " background mismatch: " + style.backgroundColor);
+        assert(style.color === expected[1], span.className + " color mismatch: " + style.color);
+        assert(style.fontStyle === expected[2], span.className + " font-style mismatch: " + style.fontStyle);
+        assert(style.textDecorationLine === expected[3], span.className + " text-decoration mismatch: " + style.textDecorationLine);
+        assert(style.backgroundColor === expected[4], span.className + " background mismatch: " + style.backgroundColor);
       });
       host.remove();
     });
