@@ -289,3 +289,9 @@ node test/style-rules.test.js
 ```
 
 ライブラリ利用時にNode.jsは必要ありません。
+
+## 関連する VSCode 拡張の仕様
+
+BigQuery GoogleSQL 用の VSCode ハイライト拡張、SQL 実行・ドライラン拡張、および `%%define` 等の独自マジックコマンドの確定仕様は [仕様・引き継ぎ資料](docs/vscode-bigquery-extensions-spec.md) を参照してください。
+
+**本リポジトリはブラウザ向けライブラリです。VSCode 拡張（VSIX 本体）は含みません。**
