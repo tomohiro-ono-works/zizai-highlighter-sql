@@ -11,7 +11,7 @@ VSCode 上で BigQuery GoogleSQL を読みやすく編集し、必要なとき�
 | 成果物 | 役割 | 現在の状態 |
 | --- | --- | --- |
 | `zizai-highlighter-sql`（本リポジトリ） | ブラウザの `textarea` に SQL ハイライトを重ねる JavaScript/CSS ライブラリ。BigQuery・DuckDB に対応 | 既存実装。**VSCode 拡張ではない** |
-| `BigQuery GoogleSQL Language` | VSCode の言語モード、構文ハイライト、括弧補完・基本インデント | VSIX `bigquery-sql-language-0.2.1.vsix` を作成済み |
+| `BigQuery GoogleSQL Language` | VSCode の言語モード、構文ハイライト、括弧補完・基本インデント | VSIX `bigquery-sql-language-0.2.2.vsix` を作成済み |
 | `BigQuery Execute & Dry Run` | VSCode から明示的に SQL 実行・ドライランを行い、結果を閲覧 | VSIX `bigquery-dry-run-0.2.3.vsix` を作成済み |
 
 VSCode 用の2つは併用する設計。本リポジトリへこの仕様書を同梱するが、**上記2つの VSIX 本体やそのソースコードを本リポジトリへ移したことは意味しない**。
@@ -26,13 +26,15 @@ VSCode 用の2つは併用する設計。本リポジトリへこの仕様書を
 - BigQuery への接続、認証、スキーマ取得、SQL 実行は担当しない。
 - VSCode 全体のカラーテーマとは独立して、GoogleSQL モード用の装飾を提供する。
 
-### 2.2 実装済み・配布済み（v0.2.1）
+### 2.2 実装済み・配布済み（v0.2.2）
 
 - GoogleSQL のキーワード、関数、データ型、数値、文字列、パラメータ等の区別。
 - コメントの背景色、キーワード等の斜体、テーブル・CTE 名等の下線・色分け。
 - 括弧補完、基本的なインデント。
 - **v0.2.1追加：** GoogleSQLエディタでユーザーが選択した文字範囲のみ、黄色（`#FFF176`）の背景を表示。選択解除で消去し、他言語には適用しない。単語の他の出現箇所は強調しない。
-- `bigquery-sql-language-0.2.1.vsix` を作成済み。オフライン自動テスト18件成功（既存14件＋新規4件）。VSCode実機上の見た目は未検証。
+- **v0.2.2追加：** VSCode の補完APIで、既存GoogleSQL文法の構文キーワード・関数をオフライン補完する。1文字はキーワードの前方一致のみ、2文字はキーワード・関数の前方一致、3文字以上は両者の前方一致を優先したうえで部分一致も表示（大文字・小文字を区別しない）。
+- 関数候補を選択すると `COUNT()` のように括弧を挿入し、カーソルを括弧内に置く。`NET.IP_FROM_STRING` 等の名前空間も維持。コメント・文字列・SQLパラメータ内では候補を出さない。VSCode 標準の単語補完は維持。
+- `bigquery-sql-language-0.2.2.vsix` を作成済み。オフライン自動テスト31件成功（v0.2.1 の18件＋新規13件）。VSIX とソース ZIP の整合性確認済み。VSCode 実機上の補完・見た目は未検証。
 
 ### 2.3 継続検討
 
@@ -149,7 +151,7 @@ SELECT * FROM `%%dataset.orders` -- %%missing は展開しない
 | 項目 | 状態／担当 |
 | --- | --- |
 | ブラウザ `textarea` 向け SQL ハイライト | 本リポジトリ `zizai-highlighter-sql`（既存） |
-| VSCode GoogleSQL ハイライトと基本編集支援 | `BigQuery GoogleSQL Language`（別 VSIX、v0.2.1） |
+| VSCode GoogleSQL ハイライトと基本編集支援 | `BigQuery GoogleSQL Language`（別 VSIX、v0.2.2） |
 | VSCode 実行・ドライラン・マジック展開 | `BigQuery Execute & Dry Run`（別 VSIX、v0.2.3） |
 | マジック記法専用の視覚的ハイライト | ハイライト拡張側で今後確認・検討 |
 | SQL カラム・テーブル定義の接続ベース検査や補完 | 今回の実装対象外 |
